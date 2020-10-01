@@ -1,16 +1,28 @@
-﻿using System;
+﻿using System.Linq;
+using System.Reflection;
+using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace SharpAspect
 {
     public static class ServiceCollectionExtensions
     {
-        private static DynamicProxyConfiguration proxyConfig;
-        public static IServiceCollection ConfigureDynamicProxy(this IServiceCollection services, Action<DynamicProxyConfiguration> action)
+        public static IServiceCollection EnableDynamicProxy(this IServiceCollection services)
         {
-            proxyConfig = new DynamicProxyConfiguration(services);
+            var proxyConfig = new DynamicProxyConfiguration(services);
 
-            action(proxyConfig);
+            var interceptors = Assembly.GetEntryAssembly().GetTypes()
+                .Where(x => x.GetCustomAttribute<InterceptorAttribute>() != null);
+
+            foreach (var interceptor in interceptors)
+            {
+                var attribute = interceptor.GetCustomAttribute<InterceptorAttribute>().AttributeType;
+                proxyConfig.AddInterceptor(attribute, interceptor);
+            }
+
+            services.TryAddSingleton(proxyConfig);
+            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
 
             return services;
         }
@@ -38,8 +50,9 @@ namespace SharpAspect
         {
             var serviceProvider = services.BuildServiceProvider();
 
-            var targetObj = ActivatorUtilities.CreateInstance<TImplementation>(serviceProvider);
-            var proxyObj  = new ProxyFactory<TService>(serviceProvider, proxyConfig).CreateProxy(targetObj);
+            var proxyConfig = serviceProvider.GetRequiredService<DynamicProxyConfiguration>();
+            var targetObj   = ActivatorUtilities.CreateInstance<TImplementation>(serviceProvider);
+            var proxyObj    = new ProxyFactory<TService>(serviceProvider, proxyConfig).CreateProxy(targetObj);
 
             services.Add(new ServiceDescriptor(typeof(TService), sp => proxyObj, lifetime));
 
