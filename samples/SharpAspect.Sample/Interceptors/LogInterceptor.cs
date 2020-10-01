@@ -1,5 +1,6 @@
 namespace SharpAspect.Sample
 {
+    [Interceptor(typeof(LogAttribute))]
     public class LogInterceptor : IMethodInterceptor
     {
         public void AfterInvoke(IInvocation invocation)

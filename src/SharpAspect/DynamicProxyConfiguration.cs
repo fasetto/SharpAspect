@@ -14,8 +14,6 @@ namespace SharpAspect
         {
             this.services = services;
             this.Interceptors = new List<InterceptorMapping>();
-
-            this.services.AddSingleton<IProxyGenerator, ProxyGenerator>();
         }
 
         public void AddInterceptor<TAttribute, TInterceptor>()
@@ -23,6 +21,11 @@ namespace SharpAspect
             where TAttribute: MethodInterceptorAttribute
         {
             this.Interceptors.Add(new InterceptorMapping<TAttribute, TInterceptor>());
+        }
+
+        public void AddInterceptor(Type attributeType, Type interceptorType)
+        {
+            this.Interceptors.Add(new InterceptorMapping(attributeType, interceptorType));
         }
     }
 }

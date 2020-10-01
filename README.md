@@ -15,7 +15,7 @@
 dotnet add package SharpAspect
 ```
 
-### Defining Interceptors
+### Defining & mapping your Interceptors
 
 All attributes must derive from *MethodInterceptionAttribute* class.
 
@@ -32,9 +32,10 @@ public class CacheAttribute: MethodInterceptorAttribute
 ```
 <br>
 
-All interceptors also must implement the *IMethodInterceptor* interface.
+All interceptors also must implement the *IMethodInterceptor* interface and should be marked with `[Interceptor(typeof(TAttribute))]`.
 
 ```cs
+[Interceptor(typeof(LogAttribute))]
 public class LogInterceptor : IMethodInterceptor
 {
     public void AfterInvoke(IInvocation invocation)
@@ -54,6 +55,7 @@ public class LogInterceptor : IMethodInterceptor
     }
 }
 
+[Interceptor(typeof(CacheAttribute))]
 public class CacheInterceptor : IMethodInterceptor
 {
     public void AfterInvoke(IInvocation invocation)
@@ -73,18 +75,13 @@ public class CacheInterceptor : IMethodInterceptor
 }
 ```
 
-### Registering your interceptors
+### Registering your services
 
 ```cs
 private static IServiceProvider ConfigureServices()
 {
     return new ServiceCollection()
-        .ConfigureDynamicProxy(c =>
-        {
-            // Attribute & Interceptor mapping
-            c.AddInterceptor<CacheAttribute, CacheInterceptor>();
-            c.AddInterceptor<LogAttribute, LogInterceptor>();
-        })
+        .EnableDynamicProxy()
 
         // Transient service
         .AddTransientProxy<IRocket, Rocket>()

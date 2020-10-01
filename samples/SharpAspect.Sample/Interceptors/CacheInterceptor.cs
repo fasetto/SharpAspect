@@ -1,5 +1,6 @@
 namespace SharpAspect.Sample
 {
+    [Interceptor(typeof(CacheAttribute))]
     public class CacheInterceptor : IMethodInterceptor
     {
         public void AfterInvoke(IInvocation invocation)

@@ -18,12 +18,7 @@ namespace SharpAspect.Sample
         private static IServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
-                .ConfigureDynamicProxy(c =>
-                {
-                    c.AddInterceptor<CacheAttribute, CacheInterceptor>();
-                    c.AddInterceptor<LogAttribute, LogInterceptor>();
-                })
-
+                .EnableDynamicProxy()
                 .AddTransientProxy<IRocket, Rocket>()
 
                 .BuildServiceProvider();
