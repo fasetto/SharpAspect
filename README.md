@@ -1,6 +1,15 @@
 
 ## Getting Started
-![NuGet](https://img.shields.io/nuget/vpre/SharpAspect?label=SharpAspect%20%7C%20NuGet) ![downloads](https://img.shields.io/nuget/dt/SharpAspect)
+
+<a href="https://www.nuget.org/packages/SharpAspect/">
+    <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/SharpAspect?label=SharpAspect%20%7C%20NuGet">
+
+</a>
+
+<a href="https://www.nuget.org/packages/SharpAspect/">
+    <img src="https://img.shields.io/nuget/dt/SharpAspect">
+</a>
+
 
 ```sh
 dotnet add package SharpAspect
