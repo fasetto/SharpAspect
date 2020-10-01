@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+
+    <PackageId>SharpAspect</PackageId>
+    <Version>0.1.3</Version>
+    <Title>SharpAspect: AOP implementation for .Net</Title>
+    <Description></Description>
+    <PackageReleaseNotes>A changelog is available at https://github.com/fasetto/SharpAspect/blob/master/CHANGELOG.md.</PackageReleaseNotes>
+    <Authors>fasetto</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageOutputPath>../../.nuget/</PackageOutputPath>
+    <PackageTags>aspect;sharp-aspect;aop;dynamic-proxy</PackageTags>
+    <PackageProjectUrl>https://github.com/fasetto/SharpAspect</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fasetto/SharpAspect</RepositoryUrl>
+    <DocumentationUrl>https://raw.githubusercontent.com/fasetto/SharpAspect/master/README.md</DocumentationUrl>
   </PropertyGroup>
 
   <ItemGroup>
