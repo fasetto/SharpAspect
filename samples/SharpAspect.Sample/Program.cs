@@ -1,5 +1,4 @@
 ﻿using System;
-using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SharpAspect.Sample
@@ -18,8 +17,6 @@ namespace SharpAspect.Sample
 
         private static IServiceProvider ConfigureServices()
         {
-            var proxyGenerator = new ProxyGenerator();
-
             return new ServiceCollection()
                 .ConfigureDynamicProxy(c =>
                 {
