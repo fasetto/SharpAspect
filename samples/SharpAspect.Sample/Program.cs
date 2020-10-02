@@ -22,11 +22,9 @@ namespace SharpAspect.Sample
         {
             return new ServiceCollection()
                 .AddSingleton<Logger>()
+                .AddTransient<IRocket, Rocket>()
 
-                // Order is important here,
-                // you must enable the dynamic proxy first before adding your proxied services
                 .EnableDynamicProxy()
-                .AddTransientProxy<IRocket, Rocket>()
 
                 .BuildServiceProvider();
         }
