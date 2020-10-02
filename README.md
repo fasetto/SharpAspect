@@ -2,7 +2,7 @@
 ## Getting Started
 
 <a href="https://www.nuget.org/packages/SharpAspect/">
-    <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/SharpAspect?label=SharpAspect%20%7C%20NuGet">
+    <img alt="Nuget" src="https://img.shields.io/nuget/vpre/SharpAspect">
 
 </a>
 
@@ -106,11 +106,10 @@ private static IServiceProvider ConfigureServices()
 {
     return new ServiceCollection()
         .AddSingleton<Logger>()
+        .AddTransienty<IRocket, Rocket>()
 
-        // Order is important here,
-        // you must enable the dynamic proxy first before adding your proxied services
+        // Call this, after you registerd your services.
         .EnableDynamicProxy()
-        .AddTransientProxy<IRocket, Rocket>()
 
         .BuildServiceProvider();
 }
@@ -125,6 +124,9 @@ public interface IRocket
     void Launch();
 }
 
+// Enabled interception for service type IRocket
+
+[Intercept(typeof(IRocket))]
 public class Rocket: IRocket
 {
     [CheckFuel]

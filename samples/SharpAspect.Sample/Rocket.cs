@@ -1,5 +1,6 @@
 namespace SharpAspect.Sample
 {
+    [Intercept(typeof(IRocket))]
     public class Rocket: IRocket
     {
         [CheckFuel]
