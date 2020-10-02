@@ -3,6 +3,14 @@ namespace SharpAspect.Sample
     [Interceptor(typeof(LogAttribute))]
     public class LogInterceptor : IMethodInterceptor
     {
+        private readonly Logger logger;
+
+        // The Logger dependency will be resolved using Microsoft's DI container
+        public LogInterceptor(Logger logger)
+        {
+            this.logger = logger;
+        }
+
         public void AfterInvoke(IInvocation invocation)
         {
             // throw new System.NotImplementedException();
@@ -10,7 +18,7 @@ namespace SharpAspect.Sample
 
         public void BeforeInvoke(IInvocation invocation)
         {
-            System.Console.WriteLine($"[Logging] {invocation.Method.DeclaringType.FullName}.{invocation.Method.Name}");
+            logger.LogInfo($"Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
         }
 
         public void OnError(IInvocation invocation, System.Exception e)
