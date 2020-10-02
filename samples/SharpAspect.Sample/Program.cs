@@ -10,7 +10,12 @@ namespace SharpAspect.Sample
             var services = ConfigureServices();
 
             var rocket = services.GetRequiredService<IRocket>();
+
+            rocket.Name = "Falcon 9";
+            rocket.Fuel = 90.21d;
             rocket.Launch();
+
+            System.Console.WriteLine($"{rocket.Name} launched successfully. (:");
         }
 
         private static IServiceProvider ConfigureServices()

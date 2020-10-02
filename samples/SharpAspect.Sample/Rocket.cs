@@ -2,6 +2,10 @@ namespace SharpAspect.Sample
 {
     public class Rocket: IRocket
     {
+        [CheckFuel]
+        public double Fuel { get; set; }
+        public string Name { get; set; }
+
         [Log]
         public void Launch()
         {

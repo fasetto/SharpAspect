@@ -18,7 +18,7 @@ namespace SharpAspect.Sample
 
         public void BeforeInvoke(IInvocation invocation)
         {
-            logger.LogInfo($"Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
+            logger.LogInfo($"[BeforeInvoke] Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
         }
 
         public void OnError(IInvocation invocation, System.Exception e)
