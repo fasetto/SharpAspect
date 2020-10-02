@@ -12,7 +12,38 @@ namespace SharpAspect
         {
             var proxyConfig = new DynamicProxyConfiguration(services);
 
-            var interceptors = Assembly.GetEntryAssembly().GetTypes()
+            var typesInAssembly = Assembly.GetEntryAssembly().GetTypes();
+
+            AddInterceptorMappings(proxyConfig, typesInAssembly);
+
+            services.TryAddSingleton(proxyConfig);
+            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
+
+            var serviceTypes = typesInAssembly
+                .Where(x => x.GetCustomAttribute<InterceptAttribute>() != null);
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            foreach (var type in serviceTypes)
+            {
+                var serviceType = type.GetCustomAttribute<InterceptAttribute>().ServiceType;
+
+                var targetObj = serviceProvider.GetRequiredService(serviceType);
+                var proxyObj = new ProxyFactory(serviceProvider, proxyConfig).CreateProxy(serviceType, targetObj);
+
+                var serviceDescriptor = services.FirstOrDefault(x => x.ServiceType == serviceType);
+
+                // Remove previous implementation and add the decorated service.
+                services.Remove(serviceDescriptor);
+                services.Add(new ServiceDescriptor(serviceType, sp => proxyObj, serviceDescriptor.Lifetime));
+            }
+
+            return services;
+        }
+
+        private static void AddInterceptorMappings(DynamicProxyConfiguration proxyConfig, System.Type[] typesInAssembly)
+        {
+            var interceptors = typesInAssembly
                 .Where(x => x.GetCustomAttribute<InterceptorAttribute>() != null);
 
             foreach (var interceptor in interceptors)
@@ -20,43 +51,6 @@ namespace SharpAspect
                 var attribute = interceptor.GetCustomAttribute<InterceptorAttribute>().AttributeType;
                 proxyConfig.AddInterceptor(attribute, interceptor);
             }
-
-            services.TryAddSingleton(proxyConfig);
-            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddTransientProxy<TService, TImplementation>(this IServiceCollection services)
-            where TImplementation: TService
-        {
-            return AddProxyWithLifeTime<TService, TImplementation>(services, ServiceLifetime.Transient);
-        }
-
-        public static IServiceCollection AddSingletonProxy<TService, TImplementation>(this IServiceCollection services)
-            where TImplementation: TService
-        {
-            return AddProxyWithLifeTime<TService, TImplementation>(services, ServiceLifetime.Singleton);
-        }
-
-        public static IServiceCollection AddScopedProxy<TService, TImplementation>(this IServiceCollection services)
-            where TImplementation: TService
-        {
-            return AddProxyWithLifeTime<TService, TImplementation>(services, ServiceLifetime.Scoped);
-        }
-
-        private static IServiceCollection AddProxyWithLifeTime<TService, TImplementation>(IServiceCollection services, ServiceLifetime lifetime)
-            where TImplementation: TService
-        {
-            var serviceProvider = services.BuildServiceProvider();
-
-            var proxyConfig = serviceProvider.GetRequiredService<DynamicProxyConfiguration>();
-            var targetObj   = ActivatorUtilities.CreateInstance<TImplementation>(serviceProvider);
-            var proxyObj    = new ProxyFactory<TService>(serviceProvider, proxyConfig).CreateProxy(targetObj);
-
-            services.Add(new ServiceDescriptor(typeof(TService), sp => proxyObj, lifetime));
-
-            return services;
         }
     }
 }
