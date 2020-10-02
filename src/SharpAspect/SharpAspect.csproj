@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
 
     <PackageId>SharpAspect</PackageId>
-    <Version>1.2.3</Version>
+    <Version>2.2.3-beta</Version>
     <Title>SharpAspect: AOP implementation for .Net</Title>
     <Description></Description>
     <PackageReleaseNotes>A changelog is available at https://github.com/fasetto/SharpAspect/blob/master/CHANGELOG.md.</PackageReleaseNotes>
