@@ -17,19 +17,14 @@ dotnet add package SharpAspect
 
 ### Defining & mapping your Interceptors
 
-All attributes must derive from *MethodInterceptorAttribute* class.
+
+#### Method Interception
 
 ```cs
 public class LogAttribute: MethodInterceptorAttribute
 {
-
 }
-```
-<br>
 
-All interceptors also must implement the *IMethodInterceptor* interface and should be marked with `[Interceptor(typeof(TAttribute))]`.
-
-```cs
 [Interceptor(typeof(LogAttribute))]
 public class LogInterceptor : IMethodInterceptor
 {
@@ -55,6 +50,39 @@ public class LogInterceptor : IMethodInterceptor
     {
         throw new System.NotImplementedException();
         // System.Console.WriteLine(e.Message);
+    }
+}
+```
+
+#### Property Interception
+
+```cs
+public class CheckFuelAttribute: PropertyInterceptorAttribute
+{
+}
+
+[Interceptor(typeof(CheckFuelAttribute))]
+public class CheckFuelInterceptor : IPropertyInterceptor
+{
+    private readonly Logger logger;
+    public CheckFuelInterceptor(Logger logger)
+    {
+        this.logger = logger;
+    }
+
+    public void OnGet(IInvocation invocation)
+    {
+
+    }
+
+    public void OnSet(IInvocation invocation, object value)
+    {
+        var hasEnoughFuel = (double) value > 70d;
+
+        if (!hasEnoughFuel)
+            throw new System.Exception("Fuel is not enough to launch.");
+
+        logger.LogInfo($"[OnSet] Fuel: %{value}, enough to launch.");
     }
 }
 ```
@@ -91,11 +119,18 @@ private static IServiceProvider ConfigureServices()
 ```cs
 public interface IRocket
 {
+    double Fuel { get; set; }
+    string Name { get; set; }
+
     void Launch();
 }
 
 public class Rocket: IRocket
 {
+    [CheckFuel]
+    public double Fuel { get; set; }
+    public string Name { get; set; }
+
     [Log]
     public void Launch()
     {
@@ -110,13 +145,20 @@ static void Main(string[] args)
     var services = ConfigureServices();
 
     var rocket = services.GetRequiredService<IRocket>();
+
+    rocket.Name = "Falcon 9";
+    rocket.Fuel = 90.21d;
     rocket.Launch();
+
+    System.Console.WriteLine($"{rocket.Name} launched successfully. (:");
 }
 ```
 
 ### Sample Output
 
 ```sh
-[+] Executing method: SharpAspect.Sample.Rocket.Launch
+[+] [OnSet] Fuel: %90.21, enough to launch.
+[+] [BeforeInvoke] Executing method: SharpAspect.Sample.Rocket.Launch
 Launching rocket in 3...2.....1 🚀
+Falcon 9 launched successfully. (:
 ```
