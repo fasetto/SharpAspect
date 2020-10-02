@@ -17,15 +17,10 @@ dotnet add package SharpAspect
 
 ### Defining & mapping your Interceptors
 
-All attributes must derive from *MethodInterceptionAttribute* class.
+All attributes must derive from *MethodInterceptorAttribute* class.
 
 ```cs
 public class LogAttribute: MethodInterceptorAttribute
-{
-
-}
-
-public class CacheAttribute: MethodInterceptorAttribute
 {
 
 }
@@ -38,6 +33,14 @@ All interceptors also must implement the *IMethodInterceptor* interface and shou
 [Interceptor(typeof(LogAttribute))]
 public class LogInterceptor : IMethodInterceptor
 {
+    private readonly Logger logger;
+
+    // The Logger dependency will be resolved using Microsoft's DI container
+    public LogInterceptor(Logger logger)
+    {
+        this.logger = logger;
+    }
+
     public void AfterInvoke(IInvocation invocation)
     {
         // throw new System.NotImplementedException();
@@ -45,7 +48,7 @@ public class LogInterceptor : IMethodInterceptor
 
     public void BeforeInvoke(IInvocation invocation)
     {
-        System.Console.WriteLine($"[Logging] {invocation.Method.DeclaringType.FullName}.{invocation.Method.Name}");
+        logger.LogInfo($"Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
     }
 
     public void OnError(IInvocation invocation, System.Exception e)
@@ -54,23 +57,16 @@ public class LogInterceptor : IMethodInterceptor
         // System.Console.WriteLine(e.Message);
     }
 }
+```
 
-[Interceptor(typeof(CacheAttribute))]
-public class CacheInterceptor : IMethodInterceptor
+Simple logger.
+
+```cs
+public class Logger
 {
-    public void AfterInvoke(IInvocation invocation)
+    public void LogInfo(string message)
     {
-        // throw new System.NotImplementedException();
-    }
-
-    public void BeforeInvoke(IInvocation invocation)
-    {
-        System.Console.WriteLine($"[Caching] {invocation.Method.DeclaringType.FullName}.{invocation.Method.Name}");
-    }
-
-    public void OnError(IInvocation invocation, System.Exception e)
-    {
-        throw new System.NotImplementedException();
+        System.Console.WriteLine($"[+] {message}");
     }
 }
 ```
@@ -81,9 +77,11 @@ public class CacheInterceptor : IMethodInterceptor
 private static IServiceProvider ConfigureServices()
 {
     return new ServiceCollection()
-        .EnableDynamicProxy()
+        .AddSingleton<Logger>()
 
-        // Transient service
+        // Order is important here,
+        // you must enable the dynamic proxy first before adding your proxied services
+        .EnableDynamicProxy()
         .AddTransientProxy<IRocket, Rocket>()
 
         .BuildServiceProvider();
@@ -94,7 +92,6 @@ private static IServiceProvider ConfigureServices()
 public interface IRocket
 {
     void Launch();
-    string SetRoute(string route);
 }
 
 public class Rocket: IRocket
@@ -103,14 +100,6 @@ public class Rocket: IRocket
     public void Launch()
     {
         System.Console.WriteLine("Launching rocket in 3...2.....1 🚀");
-    }
-
-    [Log]
-    [Cache]
-    public string SetRoute(string route)
-    {
-        System.Console.WriteLine($"Route: {route}");
-        return route;
     }
 }
 ```
@@ -121,8 +110,6 @@ static void Main(string[] args)
     var services = ConfigureServices();
 
     var rocket = services.GetRequiredService<IRocket>();
-
-    rocket.SetRoute("Moon");
     rocket.Launch();
 }
 ```
@@ -130,10 +117,6 @@ static void Main(string[] args)
 ### Sample Output
 
 ```sh
-[Logging] SharpAspect.Sample.IRocket.SetRoute
-[Caching] SharpAspect.Sample.IRocket.SetRoute
-Route: Moon
-
-[Logging] SharpAspect.Sample.IRocket.Launch
+[+] Executing method: SharpAspect.Sample.Rocket.Launch
 Launching rocket in 3...2.....1 🚀
 ```

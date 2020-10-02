@@ -10,14 +10,16 @@ namespace SharpAspect.Sample
             var services = ConfigureServices();
 
             var rocket = services.GetRequiredService<IRocket>();
-
-            rocket.SetRoute("Moon");
             rocket.Launch();
         }
 
         private static IServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
+                .AddSingleton<Logger>()
+
+                // Order is important here,
+                // you must enable the dynamic proxy first before adding your proxied services
                 .EnableDynamicProxy()
                 .AddTransientProxy<IRocket, Rocket>()
 
