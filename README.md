@@ -106,7 +106,7 @@ private static IServiceProvider ConfigureServices()
 {
     return new ServiceCollection()
         .AddSingleton<Logger>()
-        .AddTransienty<IRocket, Rocket>()
+        .AddTransient<IRocket, Rocket>()
 
         // Call this, after you registerd your services.
         .EnableDynamicProxy()
