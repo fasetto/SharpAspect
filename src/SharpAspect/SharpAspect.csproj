@@ -5,9 +5,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>SharpAspect</PackageId>
-    <Version>3.0.0-rc</Version>
+    <Version>3.0.0</Version>
     <Title>SharpAspect: AOP implementation for .Net</Title>
-    <Description></Description>
+    <Description>AOP implementation for .Net</Description>
     <PackageReleaseNotes>A changelog is available at https://github.com/fasetto/SharpAspect/blob/master/CHANGELOG.md.</PackageReleaseNotes>
     <Authors>fasetto</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
