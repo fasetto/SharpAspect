@@ -44,11 +44,11 @@ namespace SharpAspect
         private static void AddInterceptorMappings(DynamicProxyConfiguration proxyConfig, System.Type[] typesInAssembly)
         {
             var interceptors = typesInAssembly
-                .Where(x => x.GetCustomAttribute<InterceptorAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<InterceptForAttribute>() != null);
 
             foreach (var interceptor in interceptors)
             {
-                var attribute = interceptor.GetCustomAttribute<InterceptorAttribute>().AttributeType;
+                var attribute = interceptor.GetCustomAttribute<InterceptForAttribute>().AttributeType;
                 proxyConfig.AddInterceptor(attribute, interceptor);
             }
         }

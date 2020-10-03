@@ -1,6 +1,6 @@
 namespace SharpAspect.Sample
 {
-    [Interceptor(typeof(LogAttribute))]
+    [InterceptFor(typeof(LogAttribute))]
     public class LogInterceptor : IMethodInterceptor
     {
         private readonly Logger logger;

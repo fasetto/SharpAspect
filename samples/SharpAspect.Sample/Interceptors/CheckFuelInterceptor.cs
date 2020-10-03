@@ -1,6 +1,6 @@
 namespace SharpAspect.Sample
 {
-    [Interceptor(typeof(CheckFuelAttribute))]
+    [InterceptFor(typeof(CheckFuelAttribute))]
     public class CheckFuelInterceptor : IPropertyInterceptor
     {
         private readonly Logger logger;
