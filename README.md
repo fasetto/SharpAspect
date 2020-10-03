@@ -25,7 +25,7 @@ public class LogAttribute: MethodInterceptorAttribute
 {
 }
 
-[Interceptor(typeof(LogAttribute))]
+[InterceptFor(typeof(LogAttribute))]
 public class LogInterceptor : IMethodInterceptor
 {
     private readonly Logger logger;
@@ -61,7 +61,7 @@ public class CheckFuelAttribute: PropertyInterceptorAttribute
 {
 }
 
-[Interceptor(typeof(CheckFuelAttribute))]
+[InterceptFor(typeof(CheckFuelAttribute))]
 public class CheckFuelInterceptor : IPropertyInterceptor
 {
     private readonly Logger logger;
