@@ -4,6 +4,9 @@ using Castle.DynamicProxy;
 
 namespace SharpAspect
 {
+    /// <summary>
+    /// Encapsulates an invocation of a proxied method.
+    /// </summary>
     public interface IInvocation
     {
         object[] Arguments { get; }

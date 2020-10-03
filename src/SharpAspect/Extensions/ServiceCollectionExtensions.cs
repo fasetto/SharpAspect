@@ -8,6 +8,11 @@ namespace SharpAspect
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Enables run-time interception support for methods and properties using dynamic proxy technique.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection EnableDynamicProxy(this IServiceCollection services)
         {
             var proxyConfig = new DynamicProxyConfiguration(services);
