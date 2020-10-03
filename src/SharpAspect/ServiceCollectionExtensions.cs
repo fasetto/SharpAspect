@@ -12,7 +12,7 @@ namespace SharpAspect
         {
             var proxyConfig = new DynamicProxyConfiguration(services);
 
-            var typesInAssembly = Assembly.GetEntryAssembly().GetTypes();
+            var typesInAssembly = Assembly.GetCallingAssembly().GetTypes();
 
             AddInterceptorMappings(proxyConfig, typesInAssembly);
 
