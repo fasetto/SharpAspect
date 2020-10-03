@@ -43,12 +43,13 @@ namespace SharpAspect
             {
                 foreach (var interceptor in methodInterceptors)
                     interceptor.OnError(invocationContext, ex);
-
-                return;
+            }
+            finally
+            {
+                foreach (var interceptor in methodInterceptors)
+                    interceptor.AfterInvoke(invocationContext);
             }
 
-            foreach (var interceptor in methodInterceptors)
-                interceptor.AfterInvoke(invocationContext);
         }
 
         protected override async Task<TResult> InterceptAsync<TResult>(Castle.DynamicProxy.IInvocation invocation, Func<Castle.DynamicProxy.IInvocation, Task<TResult>> proceed)
@@ -71,7 +72,7 @@ namespace SharpAspect
             foreach (var interceptor in methodInterceptors)
                 interceptor.BeforeInvoke(invocationContext);
 
-            TResult result;
+            TResult result = default(TResult);
 
             try
             {
@@ -81,13 +82,12 @@ namespace SharpAspect
             {
                 foreach (var interceptor in methodInterceptors)
                     interceptor.OnError(invocationContext, ex);
-
-                return default(TResult);
-
             }
-
-            foreach (var interceptor in methodInterceptors)
-                interceptor.AfterInvoke(invocationContext);
+            finally
+            {
+                foreach (var interceptor in methodInterceptors)
+                    interceptor.AfterInvoke(invocationContext);
+            }
 
             return result;
         }
