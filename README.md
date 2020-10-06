@@ -75,7 +75,7 @@ private static IServiceProvider ConfigureServices()
         .AddSingleton<Logger>()
         .AddTransient<IRocket, Rocket>()
 
-        // Call this, after you registerd your services.
+        // Call this, after you registered your services.
         .EnableDynamicProxy()
 
         .BuildServiceProvider();
