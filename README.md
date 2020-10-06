@@ -32,6 +32,8 @@ public class LogAttribute: MethodInterceptorAttribute
 {
 }
 
+// You must specify the attribute for the interceptor.
+
 [InterceptFor(typeof(LogAttribute))]
 public class LogInterceptor: MethodInterceptor
 {
