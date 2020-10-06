@@ -16,8 +16,7 @@ dotnet add package SharpAspect
 ```
 
 **SharpAspect** is an AOP *(Aspect-Oriented Programming)* package for .Net <br>
-It depends on *Castle.Core* DynamicProxy. <br>
-Currently only supports method and property interception.
+It depends on *Castle.Core* DynamicProxy. Currently only supports method and property interception.
 
 Take advantage of run-time interception for your next project.
 
