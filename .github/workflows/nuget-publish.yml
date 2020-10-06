@@ -1,0 +1,25 @@
+
+name: publish to nuget
+on:
+  push:
+    branches:
+      - master # Default release branch
+jobs:
+  publish:
+    name: build, pack & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: publish on version change
+        id: publish_nuget
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: src/SharpAspect/SharpAspect.csproj
+          PACKAGE_NAME: SharpAspect
+
+          TAG_COMMIT: true
+          TAG_FORMAT: v*
+
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
