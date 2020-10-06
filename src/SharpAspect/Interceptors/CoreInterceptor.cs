@@ -24,7 +24,7 @@ namespace SharpAspect
                 var propertyInterceptors = invocation.FindPropertyInterceptors(proxyConfig, serviceProvider);
 
                 foreach (var interceptor in propertyInterceptors)
-                    interceptor.OnSet(invocationContext, invocation.Arguments[0]);
+                    await interceptor.OnSet(invocationContext, invocation.Arguments[0]);
 
                 await proceed(invocation).ConfigureAwait(false);
                 return;
@@ -33,7 +33,7 @@ namespace SharpAspect
             var methodInterceptors = invocation.FindMethodInterceptors(proxyConfig, serviceProvider);
 
             foreach (var interceptor in methodInterceptors)
-                interceptor.BeforeInvoke(invocationContext);
+                await interceptor.OnBefore(invocationContext);
 
             try
             {
@@ -42,12 +42,12 @@ namespace SharpAspect
             catch (Exception ex)
             {
                 foreach (var interceptor in methodInterceptors)
-                    interceptor.OnError(invocationContext, ex);
+                    await interceptor.OnError(invocationContext, ex);
             }
             finally
             {
                 foreach (var interceptor in methodInterceptors)
-                    interceptor.AfterInvoke(invocationContext);
+                    await interceptor.OnAfter(invocationContext);
             }
 
         }
@@ -62,7 +62,7 @@ namespace SharpAspect
                 var propertyInterceptors = invocation.FindPropertyInterceptors(proxyConfig, serviceProvider);
 
                 foreach (var interceptor in propertyInterceptors)
-                    interceptor.OnGet(invocationContext);
+                    await interceptor.OnGet(invocationContext);
 
                 return await proceed(invocation).ConfigureAwait(false);
             }
@@ -70,7 +70,7 @@ namespace SharpAspect
             var methodInterceptors = invocation.FindMethodInterceptors(proxyConfig, serviceProvider);
 
             foreach (var interceptor in methodInterceptors)
-                interceptor.BeforeInvoke(invocationContext);
+                await interceptor.OnBefore(invocationContext);
 
             TResult result = default(TResult);
 
@@ -81,12 +81,12 @@ namespace SharpAspect
             catch (Exception ex)
             {
                 foreach (var interceptor in methodInterceptors)
-                    interceptor.OnError(invocationContext, ex);
+                    await interceptor.OnError(invocationContext, ex);
             }
             finally
             {
                 foreach (var interceptor in methodInterceptors)
-                    interceptor.AfterInvoke(invocationContext);
+                    await interceptor.OnAfter(invocationContext);
             }
 
             return result;
