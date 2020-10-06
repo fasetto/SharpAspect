@@ -15,8 +15,15 @@
 dotnet add package SharpAspect
 ```
 
-### Defining & mapping your Interceptors
+**SharpAspect** is an AOP *(Aspect-Oriented Programming)* package for .Net <br>
+It depends on *Castle.Core* DynamicProxy. <br>
+Currently only supports method and property interception.
 
+Take advantage of run-time interception for your next project.
+
+Check the [wiki](https://github.com/fasetto/SharpAspect/wiki) page for more samples and documentation.
+
+### Defining & Mapping your Interceptors
 
 #### Method Interception
 
@@ -25,8 +32,10 @@ public class LogAttribute: MethodInterceptorAttribute
 {
 }
 
+// You must specify the attribute for the interceptor.
+
 [InterceptFor(typeof(LogAttribute))]
-public class LogInterceptor : IMethodInterceptor
+public class LogInterceptor: MethodInterceptor
 {
     private readonly Logger logger;
 
@@ -36,53 +45,13 @@ public class LogInterceptor : IMethodInterceptor
         this.logger = logger;
     }
 
-    public void AfterInvoke(IInvocation invocation)
+    // MethodInterceptor class provides OnBefore, OnAfter and OnError methods.
+    // You can override these methods to seperate the logic you don't want in your actual method.
+    public override Task OnBefore(IInvocation invocation)
     {
-        // throw new System.NotImplementedException();
-    }
+        logger.LogInfo($"[Log] Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
 
-    public void BeforeInvoke(IInvocation invocation)
-    {
-        logger.LogInfo($"Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
-    }
-
-    public void OnError(IInvocation invocation, System.Exception e)
-    {
-        throw new System.NotImplementedException();
-        // System.Console.WriteLine(e.Message);
-    }
-}
-```
-
-#### Property Interception
-
-```cs
-public class CheckFuelAttribute: PropertyInterceptorAttribute
-{
-}
-
-[InterceptFor(typeof(CheckFuelAttribute))]
-public class CheckFuelInterceptor : IPropertyInterceptor
-{
-    private readonly Logger logger;
-    public CheckFuelInterceptor(Logger logger)
-    {
-        this.logger = logger;
-    }
-
-    public void OnGet(IInvocation invocation)
-    {
-
-    }
-
-    public void OnSet(IInvocation invocation, object value)
-    {
-        var hasEnoughFuel = (double) value > 70d;
-
-        if (!hasEnoughFuel)
-            throw new System.Exception("Fuel is not enough to launch.");
-
-        logger.LogInfo($"[OnSet] Fuel: %{value}, enough to launch.");
+        return Task.FromResult(Task.CompletedTask);
     }
 }
 ```
@@ -108,7 +77,7 @@ private static IServiceProvider ConfigureServices()
         .AddSingleton<Logger>()
         .AddTransient<IRocket, Rocket>()
 
-        // Call this, after you registerd your services.
+        // Call this, after you registered your services.
         .EnableDynamicProxy()
 
         .BuildServiceProvider();
@@ -118,7 +87,6 @@ private static IServiceProvider ConfigureServices()
 ```cs
 public interface IRocket
 {
-    double Fuel { get; set; }
     string Name { get; set; }
 
     void Launch();
@@ -129,8 +97,6 @@ public interface IRocket
 [Intercept(typeof(IRocket))]
 public class Rocket: IRocket
 {
-    [CheckFuel]
-    public double Fuel { get; set; }
     public string Name { get; set; }
 
     [Log]
@@ -149,7 +115,6 @@ static void Main(string[] args)
     var rocket = services.GetRequiredService<IRocket>();
 
     rocket.Name = "Falcon 9";
-    rocket.Fuel = 90.21d;
     rocket.Launch();
 
     System.Console.WriteLine($"{rocket.Name} launched successfully. (:");
@@ -159,8 +124,7 @@ static void Main(string[] args)
 ### Sample Output
 
 ```sh
-[+] [OnSet] Fuel: %90.21, enough to launch.
-[+] [BeforeInvoke] Executing method: SharpAspect.Sample.Rocket.Launch
+[+] [Log] Executing method: SharpAspect.Sample.Rocket.Launch
 Launching rocket in 3...2.....1 🚀
 Falcon 9 launched successfully. (:
 ```

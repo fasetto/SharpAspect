@@ -1,30 +1,23 @@
+using System.Threading.Tasks;
+
 namespace SharpAspect.Sample
 {
     [InterceptFor(typeof(LogAttribute))]
-    public class LogInterceptor : IMethodInterceptor
+    public class LogInterceptor: MethodInterceptor
     {
         private readonly Logger logger;
 
-        // The Logger dependency will be resolved using Microsoft's DI container
+        // The Logger dependency will be resolved using DI container
         public LogInterceptor(Logger logger)
         {
             this.logger = logger;
         }
 
-        public void AfterInvoke(IInvocation invocation)
+        public override Task OnBefore(IInvocation invocation)
         {
-            // throw new System.NotImplementedException();
-        }
+            logger.LogInfo($"[Log] Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
 
-        public void BeforeInvoke(IInvocation invocation)
-        {
-            logger.LogInfo($"[BeforeInvoke] Executing method: {invocation.TargetType.FullName}.{invocation.Method.Name}");
-        }
-
-        public void OnError(IInvocation invocation, System.Exception e)
-        {
-            throw new System.NotImplementedException();
-            // System.Console.WriteLine(e.Message);
+            return Task.FromResult(Task.CompletedTask);
         }
     }
 }
