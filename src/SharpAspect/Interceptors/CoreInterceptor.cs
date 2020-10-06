@@ -72,7 +72,7 @@ namespace SharpAspect
             foreach (var interceptor in methodInterceptors)
                 await interceptor.OnBefore(invocationContext);
 
-            TResult result = default(TResult);
+            var result = default(TResult);
 
             try
             {
