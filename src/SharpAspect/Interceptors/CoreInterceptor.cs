@@ -5,6 +5,7 @@ using Castle.DynamicProxy;
 namespace SharpAspect
 {
     internal class CoreInterceptor: AsyncInterceptorBase
+
     {
         private readonly IServiceProvider serviceProvider;
         private readonly DynamicProxyConfiguration proxyConfig;
@@ -14,7 +15,7 @@ namespace SharpAspect
             this.proxyConfig = proxyConfig;
         }
 
-        protected override async Task InterceptAsync(Castle.DynamicProxy.IInvocation invocation, Func<Castle.DynamicProxy.IInvocation, Task> proceed)
+        protected override async Task InterceptAsync(Castle.DynamicProxy.IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<Castle.DynamicProxy.IInvocation, IInvocationProceedInfo, Task> proceed)
         {
             var invocationContext = new InvocationContext(invocation);
 
@@ -26,7 +27,7 @@ namespace SharpAspect
                 foreach (var interceptor in propertyInterceptors)
                     await interceptor.OnSet(invocationContext, invocation.Arguments[0]);
 
-                await proceed(invocation).ConfigureAwait(false);
+                await proceed(invocation, proceedInfo).ConfigureAwait(false);
                 return;
             }
 
@@ -37,7 +38,7 @@ namespace SharpAspect
 
             try
             {
-                await proceed(invocation).ConfigureAwait(false);
+                await proceed(invocation, proceedInfo).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -52,7 +53,7 @@ namespace SharpAspect
 
         }
 
-        protected override async Task<TResult> InterceptAsync<TResult>(Castle.DynamicProxy.IInvocation invocation, Func<Castle.DynamicProxy.IInvocation, Task<TResult>> proceed)
+        protected override async Task<TResult> InterceptAsync<TResult>(Castle.DynamicProxy.IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<Castle.DynamicProxy.IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
             var invocationContext = new InvocationContext(invocation);
 
@@ -64,7 +65,7 @@ namespace SharpAspect
                 foreach (var interceptor in propertyInterceptors)
                     await interceptor.OnGet(invocationContext);
 
-                return await proceed(invocation).ConfigureAwait(false);
+                return await proceed(invocation, proceedInfo).ConfigureAwait(false);
             }
 
             var methodInterceptors = invocation.FindMethodInterceptors(proxyConfig, serviceProvider);
@@ -76,7 +77,7 @@ namespace SharpAspect
 
             try
             {
-                result = await proceed(invocation).ConfigureAwait(false);
+                result = await proceed(invocation, proceedInfo).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -91,5 +92,6 @@ namespace SharpAspect
 
             return result;
         }
+
     }
 }
