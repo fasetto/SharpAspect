@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
 
     <PackageId>SharpAspect</PackageId>
-    <Version>4.1.1</Version>
+    <Version>4.1.2</Version>
     <Title>SharpAspect: AOP implementation for .Net</Title>
     <Description>AOP implementation for .Net</Description>
     <PackageReleaseNotes>A changelog is available at https://github.com/fasetto/SharpAspect/blob/master/CHANGELOG.md.</PackageReleaseNotes>
@@ -21,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.1" />
     <PackageReference Include="Castle.Core.AsyncInterceptor" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
   </ItemGroup>
 
 </Project>
